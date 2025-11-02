@@ -1,4 +1,5 @@
 import { Link } from "expo-router";
+import { fetchMeals } from "../../services/api";
 import {
   Text,
   TextInput,
@@ -43,6 +44,15 @@ const styles = StyleSheet.create({
 });
 
 export default function Index() {
+  const handlePress = async () => {
+    try {
+      const data = await fetchMeals();
+      // Show the response from the API
+      Alert.alert("API Response", JSON.stringify(data, null, 2));
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Failed to fetch meals");
+    }
+  };
   return (
     <View
       style={{
@@ -60,7 +70,17 @@ export default function Index() {
       />
       <TouchableOpacity
         style={styles.buttonCustom}
-        onPress={() => Alert.alert("Button with adjusted color pressed")}
+        onPress={async () => {
+          try {
+            const data = await fetchMeals();
+
+            if (Array.isArray(data)) {
+              Alert.alert("Meals", JSON.stringify(data, null, 2));
+            }
+          } catch (error: any) {
+            Alert.alert("Error", error.message || "Failed to fetch meals");
+          }
+        }}
       >
         <Text style={styles.buttonText}>Generate Weekly Menu</Text>
       </TouchableOpacity>
