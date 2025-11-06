@@ -24,6 +24,8 @@ export default function RootLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
       <Stack.Screen name="menus/[id]" options={{ headerShown: false }} />
+
+      <Stack.Screen name="results" options={{ title: "Your Weekly Menu" }} />
     </Stack>
   );
 }
