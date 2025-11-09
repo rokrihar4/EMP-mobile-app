@@ -1,6 +1,6 @@
-import { View, Image } from "react-native";
-import React from "react";
 import { Tabs } from "expo-router";
+import React from "react";
+import { Image, View } from "react-native";
 
 const _layout = () => {
   return (
@@ -20,7 +20,7 @@ const _layout = () => {
               <Image
                 source={
                   focused
-                    ? require("../../assets/images/favourites_gray.png")
+                    ? require("../../assets/images/favourites_green.png")
                     : require("../../assets/images/favourites.png")
                 }
                 style={{ width: 24, height: 24 }}
@@ -76,7 +76,7 @@ const _layout = () => {
               <Image
                 source={
                   focused
-                    ? require("../../assets/images/library_gray.png")
+                    ? require("../../assets/images/library_green.png")
                     : require("../../assets/images/library.png")
                 }
                 style={{ width: 24, height: 24 }}

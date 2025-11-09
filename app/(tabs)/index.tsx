@@ -1,15 +1,15 @@
-import { Link } from "expo-router";
-import { fetchMeals } from "../../services/api";
 import {
+  Alert,
+  Image,
+  StyleSheet,
   Text,
   TextInput,
-  View,
-  Button,
-  Alert,
-  StyleSheet,
   TouchableOpacity,
-  Image,
+  View,
 } from "react-native";
+
+import { router } from "expo-router";
+import { fetchMeals } from "../../services/api";
 
 const styles = StyleSheet.create({
   textInputCustom: {
@@ -61,7 +61,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Image source={require("../../assets/images/Logo.png")} />;
+      <Image source={require("../../assets/images/Logo.png")} />
       <TextInput style={styles.textInputCustom} placeholder="Budget (€)" />
       <TextInput style={styles.textInputCustom} placeholder="Time (minutes)" />
       <TextInput
@@ -75,9 +75,13 @@ export default function Index() {
             const data = await fetchMeals();
 
             if (Array.isArray(data)) {
-              Alert.alert("Meals", JSON.stringify(data, null, 2));
+              // Navigate to /results and pass the data as a URL param
+              router.push({
+                pathname: "/results",
+                params: { data: JSON.stringify(data) },
+              });
             }
-          } catch (error: any) {
+          } catch (error) {
             Alert.alert("Error", error.message || "Failed to fetch meals");
           }
         }}
