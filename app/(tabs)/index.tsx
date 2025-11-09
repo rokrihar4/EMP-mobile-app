@@ -20,7 +20,6 @@ const styles = StyleSheet.create({
     margin: 10,
     padding: 15,
     width: "60%",
-    fontFamily: "Outfit-Black",
   },
 
   buttonCustom: {
@@ -39,7 +38,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     justifyContent: "center",
-    fontFamily: "Outfit-Black",
   },
 });
 

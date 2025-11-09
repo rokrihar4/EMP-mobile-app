@@ -1,18 +1,26 @@
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import { FlatList, SafeAreaView, StyleSheet, Text } from "react-native";
+import { FlatList, SafeAreaView, StyleSheet, Text, View } from "react-native";
 
-const results = () => {
+const Results = () => {
   const { data } = useLocalSearchParams();
-
-  // Parse the JSON string that was passed
   const meals = JSON.parse(data || "[]");
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={meals}
-        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
-        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.itemContainer}>
+            <Text style={styles.itemName}>{item.name}</Text>
+            <View style={styles.detailsRow}>
+              <Text style={styles.itemDesc}>🕒 {item.prep_time} min</Text>
+              <Text style={styles.itemDesc}>💰 {item.price} €</Text>
+            </View>
+          </View>
+        )}
+        keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
+        contentContainerStyle={styles.listContent}
       />
     </SafeAreaView>
   );
@@ -20,14 +28,35 @@ const results = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 50,
     flex: 1,
+    backgroundColor: "#FFFFFF",
   },
-  item: {
-    padding: 20,
+  listContent: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
+  itemContainer: {
+    backgroundColor: "#F3F3F3", // light gray like the input fields
+    borderRadius: 12,
+    padding: 18,
+    marginVertical: 10,
+    width: "100%",
+    alignSelf: "center",
+  },
+  itemName: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000",
+    marginBottom: 8,
+  },
+  detailsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  itemDetail: {
     fontSize: 15,
-    marginTop: 5,
+    color: "#333",
   },
 });
 
-export default results;
+export default Results;
