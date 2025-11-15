@@ -5,21 +5,23 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import { router } from "expo-router";
-import { fetchMeals } from "../../services/api";
+import { useState } from "react";
+import { fetchMenu } from "../../services/api";
 
 const styles = StyleSheet.create({
   textInputCustom: {
     backgroundColor: "#D9D9D9",
     opacity: 0.42,
     borderRadius: 11,
-    fontSize: 14,
+    fontSize: 18,
     margin: 10,
     padding: 15,
-    width: "60%",
+    width: "90%",
   },
 
   buttonCustom: {
@@ -28,7 +30,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     margin: 10,
     padding: 15,
-    width: "60%",
+    width: "90%",
     color: "white",
   },
 
@@ -42,9 +44,10 @@ const styles = StyleSheet.create({
 });
 
 export default function Index() {
+  const [noOfDays, setNoOfDays] = useState("");
   const handlePress = async () => {
     try {
-      const data = await fetchMeals();
+      const data = await fetchMenu(Number(noOfDays));
       // Show the response from the API
       Alert.alert("API Response", JSON.stringify(data, null, 2));
     } catch (error: any) {
@@ -52,7 +55,7 @@ export default function Index() {
     }
   };
   return (
-    <View
+    <SafeAreaView
       style={{
         flex: 1,
         justifyContent: "center",
@@ -64,19 +67,25 @@ export default function Index() {
       <TextInput style={styles.textInputCustom} placeholder="Time (minutes)" />
       <TextInput
         style={styles.textInputCustom}
+        value={noOfDays}
+        onChangeText={setNoOfDays}
+        placeholder="Number of Days"
+      />
+      <TextInput
+        style={styles.textInputCustom}
         placeholder="Allergies (seperated by comma)"
       />
       <TouchableOpacity
         style={styles.buttonCustom}
         onPress={async () => {
           try {
-            const data = await fetchMeals();
+            const data = await fetchMenu(Number(noOfDays));
 
             if (Array.isArray(data)) {
               // Navigate to /results and pass the data as a URL param
               router.push({
                 pathname: "/results",
-                params: { data: JSON.stringify(data) },
+                params: { data: JSON.stringify(data), noOfDays },
               });
             }
           } catch (error) {
@@ -84,8 +93,10 @@ export default function Index() {
           }
         }}
       >
-        <Text style={styles.buttonText}>Generate Weekly Menu</Text>
+        <Text style={styles.buttonText}>
+          Generate {noOfDays + " day" || ""} Menu
+        </Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }

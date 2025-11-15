@@ -25,7 +25,7 @@ export default function RootLayout() {
 
       <Stack.Screen name="menus/[id]" options={{ headerShown: false }} />
 
-      <Stack.Screen name="results" options={{ title: "Your Weekly Menu" }} />
+      <Stack.Screen name="results" options={{ title: "Your Generated Menu" }} />
     </Stack>
   );
 }
