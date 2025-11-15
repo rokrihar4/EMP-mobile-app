@@ -1,50 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const Results = () => {
-  const { data } = useLocalSearchParams();
-
-  // Parse the array passed as a param
-  const menus = JSON.parse(data || "[]");
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        data={menus}
-        keyExtractor={(item, index) => index.toString()}
-        contentContainerStyle={styles.listContent}
-        renderItem={({ item }) => {
-          const meals = item.menu; // breakfast, lunch, dinner
-
-          return (
-            <View style={styles.dayCard}>
-              <Text style={styles.dayTitle}>Day {item.day}</Text>
-
-              {meals.map((meal) => (
-                <View key={meal.id} style={styles.mealCard}>
-                  <Text style={styles.mealName}>
-                    {meal.time_of_day.toUpperCase()}: {meal.name}
-                  </Text>
-
-                  <Text style={styles.mealDetail}>🕒 {meal.prep_time} min</Text>
-                  <Text style={styles.mealDetail}>💰 {meal.price} €</Text>
-
-                  {meal.allergies ? (
-                    <Text style={styles.mealAllergies}>
-                      ⚠ Allergies: {meal.allergies}
-                    </Text>
-                  ) : null}
-                </View>
-              ))}
-            </View>
-          );
-        }}
-      />
-    </SafeAreaView>
-  );
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -86,5 +43,34 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 });
+
+const Results = () => {
+  const { data } = useLocalSearchParams();
+
+  // Parse the array passed as a param
+  const menus = JSON.parse(data || "[]");
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.container}>
+        {menus.map((m) => {
+          const meals = m.menu;
+          return (
+            <View>
+              <Text style={styles.dayTitle}>{m.day}</Text>;
+              {meals.map((meal) => {
+                return (
+                  <View>
+                    <Text>{meal.name}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          );
+        })}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 export default Results;
