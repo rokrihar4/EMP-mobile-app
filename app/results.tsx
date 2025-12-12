@@ -56,11 +56,13 @@ const Results = () => {
         {menus.map((m) => {
           const meals = m.menu;
           return (
-            <View>
-              <Text style={styles.dayTitle}>{m.day}</Text>;
+            <View key={m.day}>
+              <Text key={m.day} style={styles.dayTitle}>
+                Day {m.day}
+              </Text>
               {meals.map((meal) => {
                 return (
-                  <View>
+                  <View key={meal.id}>
                     <Text>{meal.name}</Text>
                   </View>
                 );

@@ -18,14 +18,14 @@ export const fetchMeals = async() => {
 }
 
 
-export const fetchWeeklyMenu = async() => {
-    const meals = `${KUPKO_CONFIG.BASE_URL}/randomly_weekly_menu`;
+export const fetchMenu = async (noOfDays: string | number) => {
+  const meals = `${KUPKO_CONFIG.BASE_URL}/random_menu/${noOfDays}/breakfast,lunch,dinner`;
 
-    const response = await fetch(meals, {
-        method: 'GET',
-        headers: KUPKO_CONFIG.Headers
-    });
+  const response = await fetch(meals, {
+    method: "GET",
+    headers: KUPKO_CONFIG.Headers,
+  });
 
-    const data = await response.json();
-    return data.results || data.meals || data;
-}
+  const data = await response.json();
+  return data.results || data.meals || data;
+};
