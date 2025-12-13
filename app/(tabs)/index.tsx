@@ -1,10 +1,10 @@
 import {
   Alert,
-  Image,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,10 +41,57 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
   },
+
+  checkboxRow: {
+    flexDirection: "row",
+    width: "90%",
+    marginVertical: 8,
+    flexWrap: "wrap",
+  },
+
+  checkbox: {
+    backgroundColor: "#D9D9D9",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+
+  checkboxSelected: {
+    backgroundColor: "#0CD849",
+  },
+
+  checkboxText: {
+    color: "black",
+    fontSize: 15,
+  },
+
+  checkboxTextSelected: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 15,
+  },
+
+  sectionLabel: {
+    fontSize: 18,
+    width: "90%",
+    marginTop: 10,
+    marginBottom: 5,
+  },
+
+  header: {
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 10,
+    width: "90%",
+  },
 });
 
 export default function Index() {
   const [noOfDays, setNoOfDays] = useState("");
+  const [allergies, setAllergies] = useState([]);
+  const [meals, setMeals] = useState([]);
   const handlePress = async () => {
     try {
       const data = await fetchMenu(Number(noOfDays));
@@ -54,6 +101,10 @@ export default function Index() {
       Alert.alert("Error", error.message || "Failed to fetch meals");
     }
   };
+
+  const ALLERGY_OPTIONS = ["Gluten", "Eggs", "Dairy"];
+  const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
+
   return (
     <SafeAreaView
       style={{
@@ -62,7 +113,7 @@ export default function Index() {
         alignItems: "center",
       }}
     >
-      <Image source={require("../../assets/images/Logo.png")} />
+      <Text style={styles.header}>Generate menu</Text>
       <TextInput style={styles.textInputCustom} placeholder="Budget (€)" />
       <TextInput style={styles.textInputCustom} placeholder="Time (minutes)" />
       <TextInput
@@ -71,10 +122,72 @@ export default function Index() {
         onChangeText={setNoOfDays}
         placeholder="Number of Days"
       />
-      <TextInput
-        style={styles.textInputCustom}
-        placeholder="Allergies (seperated by comma)"
-      />
+      <Text style={styles.sectionLabel}>Allergies to exclude</Text>
+      <View style={styles.checkboxRow}>
+        {" "}
+        {ALLERGY_OPTIONS.map((option) => {
+          const selected = allergies.includes(option);
+          const toggleAllergy = (item) => {
+            setAllergies((prev) =>
+              prev.includes(item)
+                ? prev.filter((a) => a !== item)
+                : [...prev, item]
+            );
+          };
+
+          return (
+            <TouchableOpacity
+              key={option}
+              style={[styles.checkbox, selected && styles.checkboxSelected]}
+              onPress={() => toggleAllergy(option)}
+            >
+              {" "}
+              <Text
+                style={
+                  selected ? styles.checkboxTextSelected : styles.checkboxText
+                }
+              >
+                {" "}
+                {option}{" "}
+              </Text>{" "}
+            </TouchableOpacity>
+          );
+        })}{" "}
+      </View>
+
+      <Text style={styles.sectionLabel}>Meals of the day</Text>
+      <View style={styles.checkboxRow}>
+        {" "}
+        {MEAL_OPTIONS.map((option) => {
+          const selected = meals.includes(option);
+          const toggleMeal = (item) => {
+            setMeals((prev) =>
+              prev.includes(item)
+                ? prev.filter((a) => a !== item)
+                : [...prev, item]
+            );
+          };
+
+          return (
+            <TouchableOpacity
+              key={option}
+              style={[styles.checkbox, selected && styles.checkboxSelected]}
+              onPress={() => toggleMeal(option)}
+            >
+              {" "}
+              <Text
+                style={
+                  selected ? styles.checkboxTextSelected : styles.checkboxText
+                }
+              >
+                {" "}
+                {option}{" "}
+              </Text>{" "}
+            </TouchableOpacity>
+          );
+        })}{" "}
+      </View>
+
       <TouchableOpacity
         style={styles.buttonCustom}
         onPress={async () => {
@@ -93,9 +206,7 @@ export default function Index() {
           }
         }}
       >
-        <Text style={styles.buttonText}>
-          Generate {noOfDays + " day" || ""} Menu
-        </Text>
+        <Text style={styles.buttonText}>Generate Menu</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
