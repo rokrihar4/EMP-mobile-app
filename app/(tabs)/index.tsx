@@ -86,12 +86,45 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: "90%",
   },
+
+  mealTypeRow: {
+    flexDirection: "row",
+    width: "90%",
+    marginTop: 10,
+    marginBottom: 15,
+  },
+
+  mealTypeButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: "#D9D9D9",
+    alignItems: "center",
+    marginHorizontal: 5,
+  },
+
+  mealTypeSelected: {
+    backgroundColor: "#0CD849",
+  },
+
+  mealTypeText: {
+    color: "black",
+    fontSize: 16,
+  },
+
+  mealTypeTextSelected: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default function Index() {
   const [noOfDays, setNoOfDays] = useState("");
   const [allergies, setAllergies] = useState([]);
-  const [meals, setMeals] = useState([]);
+  const [meals, setMeals] = useState(["Breakfast", "Lunch", "Dinner"]);
+  const [mealType, setMealType] = useState("regular");
+
   const handlePress = async () => {
     try {
       const data = await fetchMenu(Number(noOfDays));
@@ -114,17 +147,25 @@ export default function Index() {
       }}
     >
       <Text style={styles.header}>Generate menu</Text>
-      <TextInput style={styles.textInputCustom} placeholder="Budget (€)" />
-      <TextInput style={styles.textInputCustom} placeholder="Time (minutes)" />
       <TextInput
         style={styles.textInputCustom}
+        keyboardType="numeric"
+        placeholder="Budget (€)"
+      />
+      <TextInput
+        style={styles.textInputCustom}
+        keyboardType="numeric"
+        placeholder="Time (minutes)"
+      />
+      <TextInput
+        style={styles.textInputCustom}
+        keyboardType="numeric"
         value={noOfDays}
         onChangeText={setNoOfDays}
         placeholder="Number of Days"
       />
       <Text style={styles.sectionLabel}>Allergies to exclude</Text>
       <View style={styles.checkboxRow}>
-        {" "}
         {ALLERGY_OPTIONS.map((option) => {
           const selected = allergies.includes(option);
           const toggleAllergy = (item) => {
@@ -141,23 +182,20 @@ export default function Index() {
               style={[styles.checkbox, selected && styles.checkboxSelected]}
               onPress={() => toggleAllergy(option)}
             >
-              {" "}
               <Text
                 style={
                   selected ? styles.checkboxTextSelected : styles.checkboxText
                 }
               >
-                {" "}
-                {option}{" "}
-              </Text>{" "}
+                {option}
+              </Text>
             </TouchableOpacity>
           );
-        })}{" "}
+        })}
       </View>
 
       <Text style={styles.sectionLabel}>Meals of the day</Text>
       <View style={styles.checkboxRow}>
-        {" "}
         {MEAL_OPTIONS.map((option) => {
           const selected = meals.includes(option);
           const toggleMeal = (item) => {
@@ -174,18 +212,40 @@ export default function Index() {
               style={[styles.checkbox, selected && styles.checkboxSelected]}
               onPress={() => toggleMeal(option)}
             >
-              {" "}
               <Text
                 style={
                   selected ? styles.checkboxTextSelected : styles.checkboxText
                 }
               >
-                {" "}
-                {option}{" "}
-              </Text>{" "}
+                {option}
+              </Text>
             </TouchableOpacity>
           );
         })}{" "}
+      </View>
+
+      <Text style={styles.sectionLabel}>Meal type</Text>
+      <View style={styles.mealTypeRow}>
+        {["regular", "vegan", "vegetarian"].map((type) => (
+          <TouchableOpacity
+            key={type}
+            style={[
+              styles.checkbox,
+              mealType === type && styles.checkboxSelected,
+            ]}
+            onPress={() => setMealType(type)}
+          >
+            <Text
+              style={
+                mealType === type
+                  ? styles.checkboxTextSelected
+                  : styles.checkboxText
+              }
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       <TouchableOpacity
