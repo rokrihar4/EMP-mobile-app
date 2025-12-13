@@ -122,12 +122,13 @@ const styles = StyleSheet.create({
 export default function Index() {
   const [noOfDays, setNoOfDays] = useState("");
   const [allergies, setAllergies] = useState([]);
-  const [meals, setMeals] = useState(["Breakfast", "Lunch", "Dinner"]);
+  const [meals, setMeals] = useState(["breakfast", "lunch", "dinner"]);
   const [mealType, setMealType] = useState("regular");
+  const mealsStr = Array.from(meals).join(",");
 
   const handlePress = async () => {
     try {
-      const data = await fetchMenu(Number(noOfDays));
+      const data = await fetchMenu(Number(noOfDays), mealsStr);
       // Show the response from the API
       Alert.alert("API Response", JSON.stringify(data, null, 2));
     } catch (error: any) {
@@ -136,7 +137,7 @@ export default function Index() {
   };
 
   const ALLERGY_OPTIONS = ["Gluten", "Eggs", "Dairy"];
-  const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
+  const MEAL_OPTIONS = ["breakfast", "lunch", "dinner"];
 
   return (
     <SafeAreaView
@@ -168,7 +169,7 @@ export default function Index() {
       <View style={styles.checkboxRow}>
         {ALLERGY_OPTIONS.map((option) => {
           const selected = allergies.includes(option);
-          const toggleAllergy = (item) => {
+          const toggleAllergy = (item: string) => {
             setAllergies((prev) =>
               prev.includes(item)
                 ? prev.filter((a) => a !== item)
@@ -198,7 +199,7 @@ export default function Index() {
       <View style={styles.checkboxRow}>
         {MEAL_OPTIONS.map((option) => {
           const selected = meals.includes(option);
-          const toggleMeal = (item) => {
+          const toggleMeal = (item: string) => {
             setMeals((prev) =>
               prev.includes(item)
                 ? prev.filter((a) => a !== item)
@@ -252,13 +253,13 @@ export default function Index() {
         style={styles.buttonCustom}
         onPress={async () => {
           try {
-            const data = await fetchMenu(Number(noOfDays));
+            const data = await fetchMenu(Number(noOfDays), mealsStr);
 
             if (Array.isArray(data)) {
               // Navigate to /results and pass the data as a URL param
               router.push({
                 pathname: "/results",
-                params: { data: JSON.stringify(data), noOfDays },
+                params: { data: JSON.stringify(data), noOfDays, mealsStr },
               });
             }
           } catch (error) {

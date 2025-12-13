@@ -63,6 +63,7 @@ const Results = () => {
               {meals.map((meal) => {
                 return (
                   <View key={meal.id}>
+                    <Text>{meal.time_of_day}</Text>
                     <Text>{meal.name}</Text>
                   </View>
                 );
