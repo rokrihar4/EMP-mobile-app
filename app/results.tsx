@@ -1,3 +1,4 @@
+import { DayMenu, Meal } from "@/lib/types/mealTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useMemo } from "react";
@@ -68,10 +69,10 @@ const Results = () => {
   const { data } = useLocalSearchParams();
 
   // Parse the array passed as a param
-  const menus = useMemo(() => {
+  const menus = useMemo<DayMenu[]>(() => {
     if (typeof data !== "string") return [];
     try {
-      return JSON.parse(data);
+      return JSON.parse(data) as DayMenu[];
     } catch {
       return [];
     }
@@ -82,8 +83,8 @@ const Results = () => {
       const existingRaw = await AsyncStorage.getItem(STORAGE_KEYS.MENUS);
       const existing = existingRaw ? JSON.parse(existingRaw) : [];
 
-      const next = menus; // overwrite
-      // const next = [...existing, ...menus];
+      // const next = menus; // to je za overwrite
+      const next = [...existing, ...menus]; // to je za merganje
 
       await AsyncStorage.setItem(
         STORAGE_KEYS.MENUS,
@@ -92,7 +93,8 @@ const Results = () => {
 
       router.push("./(tabs)/saved");
     } catch (e) {
-      Alert.alert("Error", e?.message ?? "Failed to save");
+      Alert.alert("Error", "Failed to save");
+      console.log(e);
     }
   };
 
@@ -107,14 +109,12 @@ const Results = () => {
               <Text key={m.day} style={styles.dayTitle}>
                 Day {m.day}
               </Text>
-              {meals.map((meal) => {
-                return (
-                  <View key={meal.id}>
-                    <Text>{meal.time_of_day}</Text>
-                    <Text>{meal.name}</Text>
-                  </View>
-                );
-              })}
+              {meals.map((meal: Meal) => (
+                <View key={meal.id}>
+                  <Text>{meal.time_of_day}</Text>
+                  <Text>{meal.name}</Text>
+                </View>
+              ))}
             </View>
           );
         })}

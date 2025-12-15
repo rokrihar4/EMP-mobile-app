@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -12,23 +13,8 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { deleteAll, deleteMeal } from "../../lib/storage/menusStorage";
+import type { DayMenu, Meal, TimeOfDay } from "../../lib/types/mealTypes";
 
-type TimeOfDay = "breakfast" | "lunch" | "dinner" | "snacks";
-
-type Meal = {
-  id: number; // v raw je number
-  time_of_day: TimeOfDay | string; // raw je lowercase, pustimo string za "future-proof"
-  name: string;
-  allergies?: string;
-  meal_type?: string;
-  prep_time?: number;
-  price?: number;
-};
-
-type DayMenu = {
-  day: number; // v raw je number 1..7
-  menu: Meal[];
-};
 
 const DAYS = [
   { id: "1", title: "Mon", dayNumber: 1 },
@@ -168,52 +154,54 @@ export default function Saved() {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <TouchableHighlight onPress={onDeleteAll}>
-          <View style={styles.deleteAllButton}>
-            <Text style={styles.deleteAllButtonText}>DELETE ALL!!!</Text>
-          </View>
-        </TouchableHighlight>
+        <ScrollView style={styles.container}>
+          <TouchableHighlight onPress={onDeleteAll}>
+            <View style={styles.deleteAllButton}>
+              <Text style={styles.deleteAllButtonText}>DELETE ALL!!!</Text>
+            </View>
+          </TouchableHighlight>
 
-        <Text style={styles.title}>Saved (Day {selectedDay})</Text>
+          <Text style={styles.title}>Saved (Day {selectedDay})</Text>
 
-        <FlatList
-          data={DAYS}
-          renderItem={({ item }) => (
-            <TouchableHighlight onPress={() => setSelectedDay(item.dayNumber)}>
-              <View style={styles.card}>
-                <Text style={styles.cardText}>{item.title}</Text>
-              </View>
-            </TouchableHighlight>
-          )}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        />
+          <FlatList
+            data={DAYS}
+            renderItem={({ item }) => (
+              <TouchableHighlight onPress={() => setSelectedDay(item.dayNumber)}>
+                <View style={styles.card}>
+                  <Text style={styles.cardText}>{item.title}</Text>
+                </View>
+              </TouchableHighlight>
+            )}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          />
 
-        <MealSection
-          title="Breakfast"
-          isLoading={isLoading}
-          meals={mealsFor("breakfast")}
-          onDeleteMeal={onDeleteMeal}
-        />
-        <MealSection
-          title="Lunch"
-          isLoading={isLoading}
-          meals={mealsFor("lunch")}
-          onDeleteMeal={onDeleteMeal}
-        />
-        <MealSection
-          title="Dinner"
-          isLoading={isLoading}
-          meals={mealsFor("dinner")}
-          onDeleteMeal={onDeleteMeal}
-        />
-        <MealSection
-          title="Snacks"
-          isLoading={isLoading}
-          meals={mealsFor("snacks")}
-          onDeleteMeal={onDeleteMeal}
-        />
+          <MealSection
+            title="Breakfast"
+            isLoading={isLoading}
+            meals={mealsFor("breakfast")}
+            onDeleteMeal={onDeleteMeal}
+          />
+          <MealSection
+            title="Lunch"
+            isLoading={isLoading}
+            meals={mealsFor("lunch")}
+            onDeleteMeal={onDeleteMeal}
+          />
+          <MealSection
+            title="Dinner"
+            isLoading={isLoading}
+            meals={mealsFor("dinner")}
+            onDeleteMeal={onDeleteMeal}
+          />
+          <MealSection
+            title="Snacks"
+            isLoading={isLoading}
+            meals={mealsFor("snacks")}
+            onDeleteMeal={onDeleteMeal}
+          />
+        </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );

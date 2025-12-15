@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { router } from "expo-router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { fetchMenu } from "../../services/api";
 
 const styles = StyleSheet.create({
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
 
 export default function Index() {
   const [noOfDays, setNoOfDays] = useState("");
-  const [allergies, setAllergies] = useState([]);
+  const [allergies, setAllergies] = useState<string[]>([]);
   const [meals, setMeals] = useState(["breakfast", "lunch", "dinner"]);
   const [mealType, setMealType] = useState("regular");
   const mealsStr = Array.from(meals).join(",");
@@ -262,8 +262,9 @@ export default function Index() {
                 params: { data: JSON.stringify(data), noOfDays, mealsStr },
               });
             }
-          } catch (error) {
-            Alert.alert("Error", error.message || "Failed to fetch meals");
+          } catch (e) {
+            Alert.alert("Error, Failed to fetch meals");
+            console.log(e);
           }
         }}
       >
