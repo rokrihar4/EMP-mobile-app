@@ -26,7 +26,6 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      
       "expo-router",
       [
         "expo-splash-screen",
@@ -40,8 +39,8 @@
           }
         }
       ],
-      "expo-font"
-      
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

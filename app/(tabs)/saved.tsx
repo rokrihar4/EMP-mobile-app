@@ -1,28 +1,47 @@
-import React, { useState } from "react";
-import { FlatList, StatusBar, StyleSheet, Text, TouchableHighlight, View } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Alert,
+  FlatList,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import { STORAGE_KEYS } from "../../lib/storage/keys";
+import { deleteAll, deleteMeal } from "../../lib/storage/menusStorage";
 
-const DATA = [
-  { id: "1", title: "Mon" },
-  { id: "2", title: "Tue" },
-  { id: "3", title: "Wed" },
-  { id: "4", title: "Thu" },
-  { id: "5", title: "Fri" },
-  { id: "6", title: "Sat" },
-  { id: "7", title: "Sun" },
+type TimeOfDay = "breakfast" | "lunch" | "dinner" | "snacks";
+
+type Meal = {
+  id: number; // v raw je number
+  time_of_day: TimeOfDay | string; // raw je lowercase, pustimo string za "future-proof"
+  name: string;
+  allergies?: string;
+  meal_type?: string;
+  prep_time?: number;
+  price?: number;
+};
+
+type DayMenu = {
+  day: number; // v raw je number 1..7
+  menu: Meal[];
+};
+
+const DAYS = [
+  { id: "1", title: "Mon", dayNumber: 1 },
+  { id: "2", title: "Tue", dayNumber: 2 },
+  { id: "3", title: "Wed", dayNumber: 3 },
+  { id: "4", title: "Thu", dayNumber: 4 },
+  { id: "5", title: "Fri", dayNumber: 5 },
+  { id: "6", title: "Sat", dayNumber: 6 },
+  { id: "7", title: "Sun", dayNumber: 7 },
 ];
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 10,
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  row:{
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    width: "100%",
-  },
+  container: { padding: 10, marginTop: StatusBar.currentHeight || 0 },
   card: {
     backgroundColor: "#cefae0",
     paddingVertical: 10,
@@ -31,67 +50,136 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   cardText: {
-    fontSize: 24,
+    fontSize: 24 
   },
-  title: {
-    fontSize: 36,
-    marginVertical: 20,
+  title: { 
+    fontSize: 36, 
+    marginVertical: 20 
   },
-  countText: {
-    color: '#FF00FF',
-  },
-  containerCount: {
-    flex: 1,
-    
-  },
-  button: {
-    backgroundColor: '#DDDDDD',
+  mealContainer: { 
+    marginVertical: 10, 
     padding: 10,
+    backgroundColor: "#D9D9D9" 
   },
-  countContainer: {
-    display: "flex",
-    padding: 10,
-  },
-  addSubtract: {
-    backgroundColor: "#8c8d8eff",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderRadius: 8,
-    marginHorizontal: 4,
-    width: 30,
-  },
-   mealContainer: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: "#8c8d8eff",
-  },
-  mealText: {
-    fontWeight: "bold",      // ne fontStyle, ampak fontWeight
-    fontSize: 28,
-  },
-  foodText: {
+  mealText: { 
     fontWeight: "bold",
-    color: "green",          // tintColor je za <Image />, ne za <Text />
-    fontSize: 28,
+    fontSize: 28
+  },
+  foodText: { 
+    fontWeight: "bold", 
+    color: "#0CD849", 
+    fontSize: 28 
+  },
+  deleteAllButton: {
+    backgroundColor: "#ff0000ff",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
+  deleteAllButtonText: { 
+    color: "#fff", 
+    fontWeight: "bold" 
   },
 });
 
-const items = ["Meal", "food",];
+function MealSection({title, isLoading, meals, onDeleteMeal,}: {
+  title: "Breakfast" | "Lunch" | "Dinner" | "Snacks";
+  isLoading: boolean;
+  meals: Meal[];
+  onDeleteMeal: (mealId: number) => void;
+}) {
+  return (
+    <View style={styles.mealContainer}>
+      <Text style={styles.mealText}>{title}</Text>
 
-const saved = () => {
-  const [count, setCount] = useState(0);
-  const addOnPress = () => setCount(count + 1);
-  const subtractOnPress = () => setCount(count - 1);
+      {isLoading ? (
+        <Text style={{ marginTop: 12 }}>Loading…</Text>
+      ) : meals.length === 0 ? (
+        <Text style={{ marginTop: 12 }}>No {title.toLowerCase()} saved.</Text>
+      ) : (
+        meals.map((meal) => (
+          <View key={meal.id} style={{ paddingVertical: 6 }}>
+            <Text>{meal.name}</Text>
+
+            <TouchableHighlight onPress={() => onDeleteMeal(meal.id)}>
+              <View style={{ paddingVertical: 6 }}>
+                <Text style={{ color: "red" }}>Delete</Text>
+              </View>
+            </TouchableHighlight>
+          </View>
+        ))
+      )}
+
+      <TouchableHighlight onPress={() => { /* Tuki add food za dodat -> library */ }}>
+        <View>
+          <Text style={styles.foodText}>Add food</Text>
+        </View>
+      </TouchableHighlight>
+    </View>
+  );
+}
+
+export default function Saved() {
+  const [menus, setMenus] = useState<DayMenu[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // IZBRAN DAN je number, ker raw day je number
+  const [selectedDay, setSelectedDay] = useState<number>(1);
+
+  const dayMeals = useMemo(() => {
+    const dayMenu = menus.find((m) => m.day === selectedDay);
+    return dayMenu?.menu ?? [];
+  }, [menus, selectedDay]);
+
+  const mealsFor = (time: TimeOfDay) =>
+    dayMeals.filter((meal) => meal.time_of_day === time);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEYS.MENUS);
+        const parsed: DayMenu[] = raw ? JSON.parse(raw) : [];
+        //console.log("raw:", raw);
+        //console.log("parsed:", parsed);
+        setMenus(parsed);
+      } catch (e: any) {
+        Alert.alert("Error", e?.message ?? "Failed to load");
+        setMenus([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    load();
+  }, []);
+
+  const onDeleteMeal = async (mealId: number) => {
+    // deleteMeal v storage naj tudi primerja day kot number in mealId kot number
+    const next = await deleteMeal(selectedDay, mealId);
+    setMenus(next);
+  };
+
+  const onDeleteAll = async () => {
+    const next = await deleteAll();
+    setMenus(next);
+  };
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Saved</Text>
+        <TouchableHighlight onPress={onDeleteAll}>
+          <View style={styles.deleteAllButton}>
+            <Text style={styles.deleteAllButtonText}>DELETE ALL!!!</Text>
+          </View>
+        </TouchableHighlight>
+
+        <Text style={styles.title}>Saved (Day {selectedDay})</Text>
 
         <FlatList
-          data={DATA}
+          data={DAYS}
           renderItem={({ item }) => (
-            <TouchableHighlight >
+            <TouchableHighlight onPress={() => setSelectedDay(item.dayNumber)}>
               <View style={styles.card}>
                 <Text style={styles.cardText}>{item.title}</Text>
               </View>
@@ -102,54 +190,31 @@ const saved = () => {
           showsHorizontalScrollIndicator={false}
         />
 
-        {/*
-        TO LAHK DODAVA ČE BI RES HOTLA
-        <View style={styles.countContainer}>
-          <Text>Number of meals: {count}</Text>
-          <TouchableHighlight >
-            <View >
-              <Text style={styles.addSubtract} onPress={addOnPress}>+</Text>
-            </View>
-          </TouchableHighlight>
-          <TouchableHighlight>
-            <View >
-              <Text style={styles.addSubtract} onPress={subtractOnPress}>-</Text>
-            </View>
-          </TouchableHighlight>
-        </View> */}
-        
-        <View style={styles.mealContainer}>
-          <Text style={styles.mealText}>Breakfast</Text>
-          <TouchableHighlight>
-            <Text style={styles.foodText}>Add food</Text>
-          </TouchableHighlight>
-        </View>
-
-        <View style={styles.mealContainer}>
-          <Text style={styles.mealText}>Lunch</Text>
-          <TouchableHighlight>
-            <Text style={styles.foodText}>Add food</Text>
-          </TouchableHighlight>
-        </View>
-
-        <View style={styles.mealContainer}>
-          <Text style={styles.mealText}>Dinner</Text>
-          <TouchableHighlight>
-            <Text style={styles.foodText}>Add food</Text>
-          </TouchableHighlight>
-        </View>
-
-        <View style={styles.mealContainer}>
-          <Text style={styles.mealText}>Snacks</Text>
-          <TouchableHighlight>
-            <Text style={styles.foodText}>Add food</Text>
-          </TouchableHighlight>
-        </View>
-          
+        <MealSection
+          title="Breakfast"
+          isLoading={isLoading}
+          meals={mealsFor("breakfast")}
+          onDeleteMeal={onDeleteMeal}
+        />
+        <MealSection
+          title="Lunch"
+          isLoading={isLoading}
+          meals={mealsFor("lunch")}
+          onDeleteMeal={onDeleteMeal}
+        />
+        <MealSection
+          title="Dinner"
+          isLoading={isLoading}
+          meals={mealsFor("dinner")}
+          onDeleteMeal={onDeleteMeal}
+        />
+        <MealSection
+          title="Snacks"
+          isLoading={isLoading}
+          meals={mealsFor("snacks")}
+          onDeleteMeal={onDeleteMeal}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   );
-};
-
-
-export default saved;
+}
