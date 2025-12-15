@@ -80,24 +80,31 @@ const Results = () => {
 
   const saveAndGo = async () => {
     try {
-      const existingRaw = await AsyncStorage.getItem(STORAGE_KEYS.MENUS);
-      const existing = existingRaw ? JSON.parse(existingRaw) : [];
+      // MENUS
+      const existingRawMenus = await AsyncStorage.getItem(STORAGE_KEYS.MENUS);
+      const existingMenus: DayMenu[] = existingRawMenus ? JSON.parse(existingRawMenus) : [];
 
-      // const next = menus; // to je za overwrite
-      const next = [...existing, ...menus]; // to je za merganje
+      const nextMenus: DayMenu[] = [...existingMenus, ...menus];
+      await AsyncStorage.setItem(STORAGE_KEYS.MENUS, JSON.stringify(nextMenus));
 
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.MENUS,
-        JSON.stringify(next)
-      );
+      // MEALS LIBRARY (unikatno)
+      const incomingMeals: Meal[] = menus.flatMap((d) => d.menu ?? []);
 
-      router.push("./(tabs)/saved");
+      const existingRawMeals = await AsyncStorage.getItem(STORAGE_KEYS.MEALS);
+      const existingMeals: Meal[] = existingRawMeals ? JSON.parse(existingRawMeals) : [];
+
+      // dedupe po id
+      const merged = [...existingMeals, ...incomingMeals];
+      const uniqueMeals = Array.from(new Map(merged.map((m) => [m.id, m])).values());
+
+      await AsyncStorage.setItem(STORAGE_KEYS.MEALS, JSON.stringify(uniqueMeals));
+
+      router.push("/(tabs)/saved");
     } catch (e) {
       Alert.alert("Error", "Failed to save");
       console.log(e);
     }
   };
-
 
   return (
     <SafeAreaView style={styles.container}>

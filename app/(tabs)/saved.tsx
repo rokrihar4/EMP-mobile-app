@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Alert,
@@ -15,7 +16,6 @@ import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { deleteAll, deleteMeal } from "../../lib/storage/menusStorage";
 import type { DayMenu, Meal, TimeOfDay } from "../../lib/types/mealTypes";
 
-
 const DAYS = [
   { id: "1", title: "Mon", dayNumber: 1 },
   { id: "2", title: "Tue", dayNumber: 2 },
@@ -27,7 +27,10 @@ const DAYS = [
 ];
 
 const styles = StyleSheet.create({
-  container: { padding: 10, marginTop: StatusBar.currentHeight || 0 },
+  container: { 
+    padding: 10, 
+    marginTop: StatusBar.currentHeight || 0 
+  },
   card: {
     backgroundColor: "#cefae0",
     paddingVertical: 10,
@@ -69,12 +72,13 @@ const styles = StyleSheet.create({
   },
 });
 
-function MealSection({title, isLoading, meals, onDeleteMeal,}: {
-  title: "Breakfast" | "Lunch" | "Dinner" | "Snacks";
-  isLoading: boolean;
-  meals: Meal[];
-  onDeleteMeal: (mealId: number) => void;
-}) {
+function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
+    title: "Breakfast" | "Lunch" | "Dinner" | "Snacks";
+    isLoading: boolean;
+    meals: Meal[];
+    onDeleteMeal: (mealId: number) => void;
+    day: number;
+  }) {
   return (
     <View style={styles.mealContainer}>
       <Text style={styles.mealText}>{title}</Text>
@@ -97,11 +101,19 @@ function MealSection({title, isLoading, meals, onDeleteMeal,}: {
         ))
       )}
 
-      <TouchableHighlight onPress={() => { /* Tuki add food za dodat -> library */ }}>
+      <TouchableHighlight
+        onPress={() =>
+          router.push({
+            pathname: "/(tabs)/library",
+            params: { day: String(day) },
+          })
+        }
+      >
         <View>
           <Text style={styles.foodText}>Add food</Text>
         </View>
       </TouchableHighlight>
+
     </View>
   );
 }
@@ -182,24 +194,28 @@ export default function Saved() {
             isLoading={isLoading}
             meals={mealsFor("breakfast")}
             onDeleteMeal={onDeleteMeal}
+            day={selectedDay}
           />
           <MealSection
             title="Lunch"
             isLoading={isLoading}
             meals={mealsFor("lunch")}
             onDeleteMeal={onDeleteMeal}
+            day={selectedDay}
           />
           <MealSection
             title="Dinner"
             isLoading={isLoading}
             meals={mealsFor("dinner")}
             onDeleteMeal={onDeleteMeal}
+            day={selectedDay}
           />
           <MealSection
             title="Snacks"
             isLoading={isLoading}
             meals={mealsFor("snacks")}
             onDeleteMeal={onDeleteMeal}
+            day={selectedDay}
           />
         </ScrollView>
       </SafeAreaView>
