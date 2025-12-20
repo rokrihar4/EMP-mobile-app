@@ -5,7 +5,6 @@ import {
   Alert,
   FlatList,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableHighlight,
@@ -30,7 +29,6 @@ const DAYS = [
 const styles = StyleSheet.create({
   container: { 
     padding: 10, 
-    marginTop: StatusBar.currentHeight || 0,
     width: "100%"
   },
   card: {
@@ -46,12 +44,10 @@ const styles = StyleSheet.create({
     color: "black"
   },
   title: { 
-    fontSize: 32, 
+    fontSize: 32,
     fontWeight: "bold",
     marginBottom: 10,
     width: "90%",
-    textAlign: "center",
-    alignSelf: "center"
   },
   mealContainer: { 
     marginVertical: 10, 

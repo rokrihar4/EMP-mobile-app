@@ -122,9 +122,9 @@ const styles = StyleSheet.create({
 export default function Index() {
   const [noOfDays, setNoOfDays] = useState("");
   const [allergies, setAllergies] = useState<string[]>([]);
-  const [meals, setMeals] = useState(["breakfast", "lunch", "dinner"]);
+  const [meals, setMeals] = useState(["Breakfast", "Lunch", "Dinner"]);
   const [mealType, setMealType] = useState("regular");
-  const mealsStr = Array.from(meals).join(",");
+  const mealsStr = Array.from(meals).join(",").toLowerCase();
 
   const handlePress = async () => {
     try {
@@ -137,7 +137,7 @@ export default function Index() {
   };
 
   const ALLERGY_OPTIONS = ["Gluten", "Eggs", "Dairy"];
-  const MEAL_OPTIONS = ["breakfast", "lunch", "dinner"];
+  const MEAL_OPTIONS = ["Breakfast", "Lunch", "Dinner"];
 
   return (
     <SafeAreaView
@@ -222,7 +222,7 @@ export default function Index() {
               </Text>
             </TouchableOpacity>
           );
-        })}{" "}
+        })}
       </View>
 
       <Text style={styles.sectionLabel}>Meal type</Text>
