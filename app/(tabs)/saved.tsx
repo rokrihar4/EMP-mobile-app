@@ -9,7 +9,8 @@ import {
   StyleSheet,
   Text,
   TouchableHighlight,
-  View,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
@@ -29,46 +30,61 @@ const DAYS = [
 const styles = StyleSheet.create({
   container: { 
     padding: 10, 
-    marginTop: StatusBar.currentHeight || 0 
+    marginTop: StatusBar.currentHeight || 0,
+    width: "100%"
   },
   card: {
-    backgroundColor: "#cefae0",
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderRadius: 8,
-    marginHorizontal: 4,
+    backgroundColor: "#D9D9D9",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginHorizontal: 5,
+    marginBottom: 10,
   },
   cardText: {
-    fontSize: 24 
+    fontSize: 15,
+    color: "black"
   },
   title: { 
-    fontSize: 36, 
-    marginVertical: 20 
+    fontSize: 32, 
+    fontWeight: "bold",
+    marginBottom: 10,
+    width: "90%",
+    textAlign: "center",
+    alignSelf: "center"
   },
   mealContainer: { 
     marginVertical: 10, 
-    padding: 10,
-    backgroundColor: "#D9D9D9" 
+    padding: 15,
+    backgroundColor: "#D9D9D9",
+    borderRadius: 11,
+    width: "90%",
+    alignSelf: "center"
   },
   mealText: { 
     fontWeight: "bold",
-    fontSize: 28
+    fontSize: 18,
+    color: "black"
   },
   foodText: { 
     fontWeight: "bold", 
     color: "#0CD849", 
-    fontSize: 28 
+    fontSize: 16 
   },
   deleteAllButton: {
     backgroundColor: "#ff0000ff",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    alignSelf: "flex-start",
+    borderRadius: 11,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    margin: 10,
+    width: "90%",
+    alignSelf: "center"
   },
   deleteAllButtonText: { 
     color: "#fff", 
-    fontWeight: "bold" 
+    fontWeight: "bold",
+    fontSize: 16,
+    textAlign: "center"
   },
 });
 
@@ -92,16 +108,14 @@ function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
           <View key={meal.id} style={{ paddingVertical: 6 }}>
             <Text>{meal.name}</Text>
 
-            <TouchableHighlight onPress={() => onDeleteMeal(meal.id)}>
-              <View style={{ paddingVertical: 6 }}>
+            <TouchableOpacity onPress={() => onDeleteMeal(meal.id)}>
                 <Text style={{ color: "red" }}>Delete</Text>
-              </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </View>
         ))
       )}
 
-      <TouchableHighlight
+      <TouchableOpacity
         onPress={() =>
           router.push({
             pathname: "/(tabs)/library",
@@ -109,10 +123,8 @@ function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
           })
         }
       >
-        <View>
           <Text style={styles.foodText}>Add food</Text>
-        </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
 
     </View>
   );
@@ -167,12 +179,6 @@ export default function Saved() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.container}>
-          <TouchableHighlight onPress={onDeleteAll}>
-            <View style={styles.deleteAllButton}>
-              <Text style={styles.deleteAllButtonText}>DELETE ALL!!!</Text>
-            </View>
-          </TouchableHighlight>
-
           <Text style={styles.title}>Saved (Day {selectedDay})</Text>
 
           <FlatList
@@ -217,6 +223,12 @@ export default function Saved() {
             onDeleteMeal={onDeleteMeal}
             day={selectedDay}
           />
+
+          <TouchableOpacity onPress={onDeleteAll}>
+            <View style={styles.deleteAllButton}>
+              <Text style={styles.deleteAllButtonText}>DELETE ALL</Text>
+            </View>
+          </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
