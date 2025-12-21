@@ -28,15 +28,21 @@ const DAYS = [
 
 const styles = StyleSheet.create({
   container: { 
-    padding: 10, 
-    width: "100%"
+    flex: 1,
+    width: "100%",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
   },
   card: {
     backgroundColor: "#D9D9D9",
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 12,
-    marginHorizontal: 5,
+    marginRight: 10,
     marginBottom: 10,
   },
   cardText: {
@@ -46,44 +52,75 @@ const styles = StyleSheet.create({
   title: { 
     fontSize: 32,
     fontWeight: "bold",
-    marginBottom: 10,
+    margin: 10,
     width: "90%",
   },
   mealContainer: { 
-    marginVertical: 10, 
+    margin: 10,
     padding: 15,
     backgroundColor: "#D9D9D9",
     borderRadius: 11,
     width: "90%",
-    alignSelf: "center"
   },
   mealText: { 
     fontWeight: "bold",
     fontSize: 18,
-    color: "black"
+    color: "black",
+    marginBottom: 8,
   },
   foodText: { 
     fontWeight: "bold", 
     color: "#0CD849", 
-    fontSize: 16 
+    fontSize: 16,
+    marginTop: 8,
   },
   deleteAllButton: {
     backgroundColor: "#ff0000ff",
     borderRadius: 11,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
+    fontSize: 14,
     margin: 10,
-    width: "90%",
-    alignSelf: "center"
+    padding: 15,
+    width: "100%",
   },
   deleteAllButtonText: { 
     color: "#fff", 
-    fontWeight: "bold",
     fontSize: 16,
-    textAlign: "center"
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  sectionLabel: {
+    fontSize: 18,
+    width: "90%",
+    marginTop: 10,
+    marginBottom: 5,
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    width: "90%",
+    marginVertical: 8,
+    flexWrap: "wrap",
+  },
+  checkbox: {
+    backgroundColor: "#D9D9D9",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  checkboxSelected: {
+    backgroundColor: "#0CD849",
+  },
+  checkboxText: {
+    color: "black",
+    fontSize: 15,
+  },
+  checkboxTextSelected: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 15,
   },
 });
-
 function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
     title: "Breakfast" | "Lunch" | "Dinner" | "Snacks";
     isLoading: boolean;
@@ -173,8 +210,11 @@ export default function Saved() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+      >
           <Text style={styles.title}>Saved (Day {selectedDay})</Text>
 
           <FlatList
@@ -220,9 +260,9 @@ export default function Saved() {
             day={selectedDay}
           />
 
-          <TouchableOpacity onPress={onDeleteAll}>
+          <TouchableOpacity onPress={onDeleteAll} style={{ width: "90%", alignItems: "center" }}>
             <View style={styles.deleteAllButton}>
-              <Text style={styles.deleteAllButtonText}>DELETE ALL</Text>
+              <Text style={styles.deleteAllButtonText}>Delete All</Text>
             </View>
           </TouchableOpacity>
         </ScrollView>
