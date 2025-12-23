@@ -6,7 +6,7 @@ import type { Meal } from "@/lib/types/mealTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { Alert, FlatList, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
@@ -20,6 +20,20 @@ const styles = StyleSheet.create({
   deleteAllButtonText: { 
     color: "#fff", 
     fontWeight: "bold" 
+  },
+  card: {
+    backgroundColor: "#D9D9D9",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginRight: 10,
+    marginBottom: 10,
+    flex: 1, 
+    padding: 12
+  },
+  cardText: {
+    fontSize: 15,
+    color: "black"
   },
 });
 
@@ -35,7 +49,14 @@ export default function Library() {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEYS.MEALS);
         const parsed: Meal[] = raw ? JSON.parse(raw) : [];
-        setMeals(parsed);
+
+        const uniqueMeals = parsed.filter(
+          (meal, index, mealsArray) =>
+            index === mealsArray.findIndex(m => m.id === meal.id)
+        );
+
+        setMeals(uniqueMeals);
+
       } catch (e: any) {
         Alert.alert("Error", e?.message ?? "Failed to load meals");
         setMeals([]);
@@ -72,12 +93,7 @@ export default function Library() {
 
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 12 }}>
-      <TouchableHighlight onPress={onDeleteAllMeals}>
-        <View style={styles.deleteAllButton}>
-          <Text style={styles.deleteAllButtonText}>DELETE ALL MEALS!!!</Text>
-        </View>
-      </TouchableHighlight>
+    <SafeAreaView style={styles.card}>
 
       <Text style={{ fontSize: 32, fontWeight: "800", marginBottom: 12 }}>
         Library
@@ -119,6 +135,12 @@ export default function Library() {
           )}
         />
       )}
+
+      <TouchableOpacity onPress={onDeleteAllMeals} style={{ width: "90%", alignItems: "center" }}>
+        <View style={styles.deleteAllButton}>
+          <Text style={styles.deleteAllButtonText}>Delete All Meals</Text>
+        </View>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

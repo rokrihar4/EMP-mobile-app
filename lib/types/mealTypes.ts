@@ -1,6 +1,6 @@
 export type Meal = {
   id: number; // v raw je number
-  time_of_day: TimeOfDay | string; // raw je lowercase, pustimo string za "future-proof"
+  time_of_day?: TimeOfDay | string; // raw je lowercase, pustimo string za "future-proof"
   name: string;
   allergies?: string;
   meal_type?: string;
