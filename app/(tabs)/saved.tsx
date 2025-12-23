@@ -38,7 +38,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: "center",
     alignItems: "center",
     padding: 10,
   },
@@ -47,7 +46,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 12,
-    marginRight: 10,
     marginBottom: 10,
   },
   cardText: {
@@ -80,18 +78,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   deleteAllButton: {
-    backgroundColor: "#ff0000ff",
-    borderRadius: 11,
-    fontSize: 14,
-    margin: 10,
-    padding: 15,
-    width: "100%",
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: "#ff0000",
   },
   deleteAllButtonText: { 
     color: "#fff", 
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: "bold" 
   },
   sectionLabel: {
     fontSize: 18,
@@ -267,11 +262,18 @@ export default function Saved() {
       <ScrollView 
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
+        showsHorizontalScrollIndicator={true}
+
       >
           <Text style={styles.title}>Saved (Day {selectedDay})</Text>
 
           <FlatList
             data={rotatedDays}
+            horizontal
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            style={{ width: "100%" }}
+            contentContainerStyle={{ paddingRight: 10, gap: 10, }}
             renderItem={({ item }) => (
               <TouchableHighlight onPress={() => setSelectedDay(item.dayNumber)}>
                 <View style={styles.card}>
@@ -279,10 +281,8 @@ export default function Saved() {
                 </View>
               </TouchableHighlight>
             )}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
           />
+
 
           <MealSection
             title="Breakfast"
