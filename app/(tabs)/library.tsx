@@ -1,40 +1,75 @@
 
 import { STORAGE_KEYS } from "@/lib/storage/keys";
-import { deleteAllMeals } from "@/lib/storage/mealsStorage";
+import { deleteAllMeals, deleteMeal } from "@/lib/storage/mealsStorage";
 import { addMeal } from "@/lib/storage/menusStorage";
 import type { Meal } from "@/lib/types/mealTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
   deleteAllButton: {
-    backgroundColor: "#ff0000ff",
-    paddingVertical: 10,
+    marginTop: 10,
+    paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 8,
-    alignSelf: "flex-start",
+    borderRadius: 10,
+    backgroundColor: "#ff0000",
   },
   deleteAllButtonText: { 
     color: "#fff", 
     fontWeight: "bold" 
   },
-  card: {
-    backgroundColor: "#D9D9D9",
+  deleteButton: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: "#ff0000",
+    alignSelf: "flex-end",
+    padding: 6
+  },
+  deleteButtonText: { 
+    color: "#fff", 
+    fontWeight: "bold",
+    fontSize: 18,
+  },
+  addMealButton: {
+    backgroundColor: "#0cd849ff",
     paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginRight: 10,
-    marginBottom: 10,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
+  addMealButtonText: { 
+    color: "#fff", 
+    fontWeight: "bold" 
+  },
+  container: { 
     flex: 1, 
-    padding: 12
+    padding: 12 
   },
-  cardText: {
-    fontSize: 15,
-    color: "black"
+  listContent: { 
+    paddingBottom: 24 
   },
+  mealCard: {
+    backgroundColor: "#D9D9D9",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  rowTop: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
 });
 
 export default function Library() {
@@ -44,29 +79,34 @@ export default function Library() {
   const { day } = useLocalSearchParams();
   const dayNumber = typeof day === "string" ? Number(day) : 1;
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEYS.MEALS);
-        const parsed: Meal[] = raw ? JSON.parse(raw) : [];
+  // To je hook v expo-router, ki se zažene vsakič, ko zaslon preide v fokus
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
 
-        const uniqueMeals = parsed.filter(
-          (meal, index, mealsArray) =>
-            index === mealsArray.findIndex(m => m.id === meal.id)
-        );
+      (async () => {
+        try {
+          const raw = await AsyncStorage.getItem(STORAGE_KEYS.MEALS);
+          const parsed: Meal[] = raw ? JSON.parse(raw) : [];
 
-        setMeals(uniqueMeals);
+          const uniqueMeals = parsed.filter(
+            (meal, index, arr) => index === arr.findIndex(m => m.id === meal.id)
+          );
 
-      } catch (e: any) {
-        Alert.alert("Error", e?.message ?? "Failed to load meals");
-        setMeals([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          if (active) setMeals(uniqueMeals);
+        } catch (e: any) {
+          Alert.alert("Error", e?.message ?? "Failed to load meals");
+          if (active) setMeals([]);
+        } finally {
+          if (active) setIsLoading(false);
+        }
+      })();
 
-    load();
-  }, []);
+      return () => {
+        active = false;
+      };
+    }, [])
+  );
 
   // opcijsko: sortiraj po name
   const sorted = useMemo(
@@ -91,58 +131,83 @@ export default function Library() {
     }
   };
 
+  const onDeleteMeal = async (id : number) => {
+    try {
+      const next = await deleteMeal(id);
+      setMeals(next);
+    } catch (e: any) {
+      Alert.alert("Error", e?.message ?? "Failed to delete meals");
+    }
+  };
+
+  const onAddMeal = () => {
+    router.push("/add-meal"); // naredi ta screen
+  };
 
   return (
-    <SafeAreaView style={styles.card}>
+  <SafeAreaView style={styles.container}>
+    <FlatList
+      data={sorted}
+      keyExtractor={(item) => String(item.id)}
+      contentContainerStyle={styles.listContent}
+      ListHeaderComponent={
+        <View style={styles.headerRow}>
+          <Text style={{ fontSize: 32, fontWeight: "800" }}>Library</Text>
 
-      <Text style={{ fontSize: 32, fontWeight: "800", marginBottom: 12 }}>
-        Library
-      </Text>
-
-      {sorted.length === 0 ? (
-        <Text>No meals saved yet.</Text>
-      ) : (
-        <FlatList
-          data={sorted}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={({ item }) => (
-            <View style={{ padding: 12, borderRadius: 10, backgroundColor: "#F3F3F3", marginBottom: 10 }}>
+          <TouchableOpacity onPress={onAddMeal}>
+            <View style={styles.addMealButton}>
+              <Text style={styles.addMealButtonText}>Add meal +</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      }
+      ListEmptyComponent={<Text>No meals saved yet.</Text>}
+      renderItem={({ item }) => (
+        <View style={styles.mealCard}>
+          <View style={styles.rowTop}>
+            <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 18, fontWeight: "700" }}>{item.name}</Text>
               <Text>{item.time_of_day}</Text>
               {!!item.allergies && <Text style={{ color: "red" }}>{item.allergies}</Text>}
               <Text>cca {item.prep_time ?? "-"} min - {item.price ?? "-"} €</Text>
-
-              <TouchableOpacity
-                onPress={async () => {
-                  try {
-                    await addMeal(dayNumber, item);   // <-- to uporabi tvojo funkcijo
-                    router.back();                    // vrne nazaj na Saved
-                  } catch (e: any) {
-                    Alert.alert("Error", e?.message ?? "Failed to add meal");
-                  }
-                }}
-                style={{
-                  marginTop: 10,
-                  paddingVertical: 10,
-                  borderRadius: 10,
-                  backgroundColor: "#0CD849",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={{ color: "white", fontWeight: "bold" }}>Add to my menu</Text>
-              </TouchableOpacity>
             </View>
-          )}
-        />
-      )}
 
-      <TouchableOpacity onPress={onDeleteAllMeals} style={{ width: "90%", alignItems: "center" }}>
-        <View style={styles.deleteAllButton}>
-          <Text style={styles.deleteAllButtonText}>Delete All Meals</Text>
+            <TouchableOpacity onPress={() => onDeleteMeal(item.id)} style={styles.deleteButton}>
+              <Text style={styles.deleteButtonText}>X</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            onPress={async () => {
+              try {
+                await addMeal(dayNumber, item);
+                router.back();
+              } catch (e: any) {
+                Alert.alert("Error", e?.message ?? "Failed to add meal");
+              }
+            }}
+            style={{
+              marginTop: 10,
+              paddingVertical: 10,
+              borderRadius: 10,
+              backgroundColor: "#0CD849",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>Add to my menu</Text>
+          </TouchableOpacity>
         </View>
-      </TouchableOpacity>
-    </SafeAreaView>
-  );
+      )}
+      ListFooterComponent={
+        <TouchableOpacity onPress={onDeleteAllMeals} style={{ alignItems: "center" }}>
+          <View style={styles.deleteAllButton}>
+            <Text style={styles.deleteAllButtonText}>Delete All Meals</Text>
+          </View>
+        </TouchableOpacity>
+      }
+    />
+  </SafeAreaView>
+);
 }
 
 

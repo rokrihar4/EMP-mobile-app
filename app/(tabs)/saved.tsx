@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Alert,
   FlatList,
@@ -27,8 +27,8 @@ const DAYS = [
 ];
 
 const getTodayDayNumber = () => {
-  const jsDay = new Date().getDay(); // 0..6 (Sun..Sat)
-  return jsDay === 0 ? 7 : jsDay;    // 1..7 (Mon..Sun)
+  const jsDay = new Date().getDay();
+  return jsDay === 0 ? 7 : jsDay;
 };
 
 const rotatedDays = useMemo(() => {
@@ -196,24 +196,31 @@ export default function Saved() {
   const mealsFor = (time: TimeOfDay) =>
     dayMeals.filter((meal) => meal.time_of_day === time);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEYS.MENUS);
-        const parsed: DayMenu[] = raw ? JSON.parse(raw) : [];
-        //console.log("raw:", raw);
-        //console.log("parsed:", parsed);
-        setMenus(parsed);
-      } catch (e: any) {
-        Alert.alert("Error", e?.message ?? "Failed to load");
-        setMenus([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
 
-    load();
-  }, []);
+      const load = async () => {
+        try {
+          setIsLoading(true);
+          const raw = await AsyncStorage.getItem(STORAGE_KEYS.MENUS);
+          const parsed: DayMenu[] = raw ? JSON.parse(raw) : [];
+          if (active) setMenus(parsed);
+        } catch (e: any) {
+          Alert.alert("Error", e?.message ?? "Failed to load");
+          if (active) setMenus([]);
+        } finally {
+          if (active) setIsLoading(false);
+        }
+      };
+
+      load();
+
+      return () => {
+        active = false;
+      };
+    }, [])
+  );
 
   const onDeleteMeal = async (mealId: number) => {
     // deleteMeal v storage naj tudi primerja day kot number in mealId kot number

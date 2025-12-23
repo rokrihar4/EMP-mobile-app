@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { STORAGE_KEYS } from "./keys";
 import type { DayMenu, Meal } from "../types/mealTypes";
+import { STORAGE_KEYS } from "./keys";
 
 export async function saveMenus(menus: DayMenu[]): Promise<void> {
   await AsyncStorage.setItem(STORAGE_KEYS.MENUS, JSON.stringify(menus));
@@ -11,10 +11,7 @@ export async function loadMenus(): Promise<DayMenu[]> {
   return raw ? (JSON.parse(raw) as DayMenu[]) : [];
 }
 
-export async function deleteMeal(
-  day: number,
-  mealId: number
-): Promise<DayMenu[]> {
+export async function deleteMeal(day: number,mealId: number): Promise<DayMenu[]> {
   const menus = await loadMenus();
 
   const next = menus.map((m) => {
@@ -34,10 +31,7 @@ export async function deleteAll(): Promise<DayMenu[]> {
   return [];
 }
 
-export async function addMeal(
-  day: number,
-  meal: Meal
-): Promise<DayMenu[]> {
+export async function addMeal(day: number, meal: Meal): Promise<DayMenu[]> {
   const menus = await loadMenus();
 
   const next =
