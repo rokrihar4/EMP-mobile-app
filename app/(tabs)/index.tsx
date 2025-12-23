@@ -120,15 +120,19 @@ const styles = StyleSheet.create({
 });
 
 export default function Index() {
-  const [noOfDays, setNoOfDays] = useState("");
+  const [noOfDays, setNoOfDays] = useState("7");
   const [allergies, setAllergies] = useState<string[]>([]);
   const [meals, setMeals] = useState(["Breakfast", "Lunch", "Dinner"]);
   const [mealType, setMealType] = useState("regular");
   const mealsStr = Array.from(meals).join(",").toLowerCase();
+  const [prepTime, setPrepTime] = useState("");
+  const allergiesStr = Array.from(allergies).join(",").toLowerCase();
+  const [maxPrice, setmaxPrice] = useState("");
+
 
   const handlePress = async () => {
     try {
-      const data = await fetchMenu(Number(noOfDays), mealsStr);
+      const data = await fetchMenu(Number(noOfDays), mealsStr, Number(prepTime), allergiesStr, Number(maxPrice), mealType);
       // Show the response from the API
       Alert.alert("API Response", JSON.stringify(data, null, 2));
     } catch (error: any) {
@@ -151,11 +155,15 @@ export default function Index() {
       <TextInput
         style={styles.textInputCustom}
         keyboardType="numeric"
+        value={maxPrice}
+        onChangeText={setmaxPrice}
         placeholder="Budget (€)"
       />
       <TextInput
         style={styles.textInputCustom}
         keyboardType="numeric"
+        value={prepTime}
+        onChangeText={setPrepTime}
         placeholder="Time (minutes)"
       />
       <TextInput
@@ -253,13 +261,13 @@ export default function Index() {
         style={styles.buttonCustom}
         onPress={async () => {
           try {
-            const data = await fetchMenu(Number(noOfDays), mealsStr);
+            const data = await fetchMenu(Number(noOfDays), mealsStr, Number(prepTime), allergiesStr, Number(maxPrice), mealType);
 
             if (Array.isArray(data)) {
               // Navigate to /results and pass the data as a URL param
               router.push({
                 pathname: "/results",
-                params: { data: JSON.stringify(data), noOfDays, mealsStr },
+                params: { data: JSON.stringify(data), noOfDays, mealsStr, prepTime, allergiesStr, maxPrice, mealType },
               });
             }
           } catch (e) {
