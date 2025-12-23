@@ -35,6 +35,21 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
   },
+  editButton: {
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginHorizontal: 4,
+    borderRadius: 10,
+    backgroundColor: "#0044ffff",
+    alignSelf: "flex-end",
+    padding: 6
+  },
+  editButtonText: { 
+    color: "#fff", 
+    fontWeight: "bold",
+    fontSize: 18,
+  },
   addMealButton: {
     backgroundColor: "#0cd849ff",
     paddingVertical: 10,
@@ -171,6 +186,13 @@ export default function Library() {
               {!!item.allergies && <Text style={{ color: "red" }}>{item.allergies}</Text>}
               <Text>cca {item.prep_time ?? "-"} min - {item.price ?? "-"} €</Text>
             </View>
+
+            <TouchableOpacity 
+              // onPress={() => onDeleteMeal(item.id)}  TODO: se treba še zment
+              style={styles.editButton}
+            >
+              <Text style={styles.editButtonText}>Edit</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity onPress={() => onDeleteMeal(item.id)} style={styles.deleteButton}>
               <Text style={styles.deleteButtonText}>X</Text>

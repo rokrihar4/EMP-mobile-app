@@ -31,18 +31,6 @@ const getTodayDayNumber = () => {
   return jsDay === 0 ? 7 : jsDay;
 };
 
-const rotatedDays = useMemo(() => {
-  const today = getTodayDayNumber();
-
-  const startIndex = DAYS.findIndex(d => d.dayNumber === today);
-
-  return [
-    ...DAYS.slice(startIndex),
-    ...DAYS.slice(0, startIndex),
-  ];
-}, []);
-
-
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
@@ -137,6 +125,34 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 15,
   },
+
+  mealCard: {
+    backgroundColor: "#F3F3F3",
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 10,
+  },
+  mealRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+  mealInfo: { 
+    flex: 1 
+  },
+  mealName: { 
+    fontSize: 16, 
+    fontWeight: "700" 
+  },
+  deleteX: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    backgroundColor: "#ff0000",
+  },
+  deleteXText: { 
+    color: "white", 
+    fontWeight: "800" 
+  },
 });
 
 function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
@@ -156,27 +172,33 @@ function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
         <Text style={{ marginTop: 12 }}>No {title.toLowerCase()} saved.</Text>
       ) : (
         meals.map((meal) => (
-          <View key={meal.id} style={{ paddingVertical: 6 }}>
-            <Text>{meal.name}</Text>
+          <View key={meal.id} style={styles.mealCard}>
+            <View style={styles.mealRow}>
+              <View style={styles.mealInfo}>
+                <Text style={styles.mealName}>{meal.name}</Text>
+                {!!meal.allergies && <Text style={{ color: "red" }}>{meal.allergies}</Text>}
+                <Text>cca {meal.prep_time ?? "-"} min - {meal.price ?? "-"} €</Text>
+              </View>
 
-            <TouchableOpacity onPress={() => onDeleteMeal(meal.id)}>
-                <Text style={{ color: "red" }}>Delete</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={() => onDeleteMeal(meal.id)} style={styles.deleteX}>
+                <Text style={styles.deleteXText}>X</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         ))
       )}
 
+
       <TouchableOpacity
         onPress={() =>
-          router.push({
-            pathname: "/(tabs)/library",
-            params: { day: String(day) },
-          })
+          router.push({ pathname: "/(tabs)/library", params: { day: String(day) } })
         }
+        style={{ marginTop: 10, alignItems: "center" }}
       >
-          <Text style={styles.foodText}>Add food</Text>
+        <View style={{ backgroundColor: "#0CD849", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 }}>
+          <Text style={{ color: "white", fontWeight: "bold" }}>Add food +</Text>
+        </View>
       </TouchableOpacity>
-
     </View>
   );
 }
@@ -192,6 +214,12 @@ export default function Saved() {
     const dayMenu = menus.find((m) => m.day === selectedDay);
     return dayMenu?.menu ?? [];
   }, [menus, selectedDay]);
+
+  const rotatedDays = useMemo(() => {
+    const today = getTodayDayNumber();
+    const startIndex = DAYS.findIndex(d => d.dayNumber === today);
+    return [...DAYS.slice(startIndex), ...DAYS.slice(0, startIndex)];
+  }, []);
 
   const mealsFor = (time: TimeOfDay) =>
     dayMeals.filter((meal) => meal.time_of_day === time);
