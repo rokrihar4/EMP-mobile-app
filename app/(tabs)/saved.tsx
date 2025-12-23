@@ -159,7 +159,26 @@ function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
   }) {
   return (
     <View style={styles.mealContainer}>
-      <Text style={styles.mealText}>{title}</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 8,
+        }}
+      >
+        <Text style={styles.mealText}>{title}</Text>
+
+        <TouchableOpacity
+          onPress={() =>
+            router.push({ pathname: "/(tabs)/library", params: { day: String(day) } })
+          }
+        >
+          <View style={{ backgroundColor: "#0CD849", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 }}>
+            <Text style={{ color: "white", fontWeight: "bold" }}>Add food +</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
 
       {isLoading ? (
         <Text style={{ marginTop: 12 }}>Loading…</Text>
@@ -182,18 +201,6 @@ function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
           </View>
         ))
       )}
-
-
-      <TouchableOpacity
-        onPress={() =>
-          router.push({ pathname: "/(tabs)/library", params: { day: String(day) } })
-        }
-        style={{ marginTop: 10, alignItems: "center" }}
-      >
-        <View style={{ backgroundColor: "#0CD849", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 }}>
-          <Text style={{ color: "white", fontWeight: "bold" }}>Add food +</Text>
-        </View>
-      </TouchableOpacity>
     </View>
   );
 }

@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginHorizontal: 4,
     borderRadius: 10,
-    backgroundColor: "#0044ffff",
+    backgroundColor: "#008cffff",
     alignSelf: "flex-end",
     padding: 6
   },
