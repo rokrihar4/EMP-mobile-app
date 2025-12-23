@@ -26,6 +26,23 @@ const DAYS = [
   { id: "7", title: "Sun", dayNumber: 7 },
 ];
 
+const getTodayDayNumber = () => {
+  const jsDay = new Date().getDay(); // 0..6 (Sun..Sat)
+  return jsDay === 0 ? 7 : jsDay;    // 1..7 (Mon..Sun)
+};
+
+const rotatedDays = useMemo(() => {
+  const today = getTodayDayNumber();
+
+  const startIndex = DAYS.findIndex(d => d.dayNumber === today);
+
+  return [
+    ...DAYS.slice(startIndex),
+    ...DAYS.slice(0, startIndex),
+  ];
+}, []);
+
+
 const styles = StyleSheet.create({
   container: { 
     flex: 1,
@@ -121,6 +138,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
 function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
     title: "Breakfast" | "Lunch" | "Dinner" | "Snacks";
     isLoading: boolean;
@@ -218,7 +236,7 @@ export default function Saved() {
           <Text style={styles.title}>Saved (Day {selectedDay})</Text>
 
           <FlatList
-            data={DAYS}
+            data={rotatedDays}
             renderItem={({ item }) => (
               <TouchableHighlight onPress={() => setSelectedDay(item.dayNumber)}>
                 <View style={styles.card}>
