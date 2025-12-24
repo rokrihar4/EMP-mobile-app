@@ -1,23 +1,49 @@
-import { addMeal as addMealToLibrary } from "@/lib/storage/mealsStorage";
-import type { MenuMeal, TimeOfDay } from "@/lib/types/mealTypes";
-import { router } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { addMeal as addMealToLibrary, loadSingleMeal, updateMeal } from "@/lib/storage/mealsStorage";
+import type { LibraryMeal } from "@/lib/types/mealTypes";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import { Alert, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-const TIMES: { label: string; value: TimeOfDay }[] = [
-  { label: "Breakfast", value: "breakfast" },
-  { label: "Lunch", value: "lunch" },
-  { label: "Dinner", value: "dinner" },
-  { label: "Snacks", value: "snacks" },
-];
-
 export default function AddMealScreen() {
+  const { mealId } = useLocalSearchParams();
+  const editingId = typeof mealId === "string" ? Number(mealId) : undefined;
+  const isEditing = Number.isFinite(editingId);
+
   const [name, setName] = useState("");
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>("breakfast");
   const [allergies, setAllergies] = useState("");
   const [mealType, setMealType] = useState("");
-  const [prepTime, setPrepTime] = useState(""); // string input
-  const [price, setPrice] = useState("");       // string input
+  const [prepTime, setPrepTime] = useState("");
+  const [price, setPrice] = useState("");
+
+  // prefill, ko je edit mode
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+
+      (async () => {
+        if (!isEditing || !editingId) return;
+
+        const m = await loadSingleMeal(editingId);
+        if (!m) {
+          Alert.alert("Error", "Meal not found");
+          router.back();
+          return;
+        }
+
+        if (!active) return;
+
+        setName(m.name ?? "");
+        setAllergies(m.allergies ?? "");
+        setMealType(m.meal_type ?? "");
+        setPrepTime(m.prep_time != null ? String(m.prep_time) : "");
+        setPrice(m.price != null ? String(m.price) : "");
+      })();
+
+      return () => {
+        active = false;
+      };
+    }, [isEditing, editingId])
+  );
 
   const parsedPrepTime = useMemo(() => {
     const v = prepTime.trim();
@@ -39,21 +65,18 @@ export default function AddMealScreen() {
       Alert.alert("Validation", "Name is required.");
       return;
     }
-
     if (parsedPrepTime !== undefined && Number.isNaN(parsedPrepTime)) {
       Alert.alert("Validation", "Prep time must be a number.");
       return;
     }
-
     if (parsedPrice !== undefined && Number.isNaN(parsedPrice)) {
       Alert.alert("Validation", "Price must be a number.");
       return;
     }
 
-    const newMeal: MenuMeal = {
-      id: Date.now(), // simple unique id (ok za začetek)
+    const meal: LibraryMeal = {
+      id: isEditing && editingId ? editingId : Date.now(),
       name: trimmedName,
-      time_of_day: timeOfDay,
       allergies: allergies.trim() || undefined,
       meal_type: mealType.trim() || undefined,
       prep_time: parsedPrepTime,
@@ -61,7 +84,11 @@ export default function AddMealScreen() {
     };
 
     try {
-      await addMealToLibrary(newMeal);
+      if (isEditing) {
+        await updateMeal(meal);
+      } else {
+        await addMealToLibrary(meal);
+      }
       router.back();
     } catch (e: any) {
       Alert.alert("Error", e?.message ?? "Failed to save meal");
@@ -70,7 +97,9 @@ export default function AddMealScreen() {
 
   return (
     <View style={{ flex: 1, padding: 16, gap: 10 }}>
-      <Text style={{ fontSize: 28, fontWeight: "800" }}>Add meal</Text>
+      <Text style={{ fontSize: 28, fontWeight: "800" }}>
+        {isEditing ? "Edit meal" : "Add meal"}
+      </Text>
 
       <TextInput
         value={name}
@@ -78,9 +107,6 @@ export default function AddMealScreen() {
         placeholder="Name (e.g. Chicken salad)"
         style={{ borderWidth: 1, borderColor: "#ccc", padding: 12, borderRadius: 10 }}
       />
-
-      {/* Time of day selector (simple buttons) */}
-      <Text style={{ fontWeight: "700", marginTop: 6 }}>Time of day</Text>
 
       <TextInput
         value={mealType}
@@ -114,7 +140,9 @@ export default function AddMealScreen() {
 
       <TouchableOpacity onPress={onSave} style={{ marginTop: 8 }}>
         <View style={{ backgroundColor: "black", padding: 14, borderRadius: 12 }}>
-          <Text style={{ color: "white", fontWeight: "800", textAlign: "center" }}>Save</Text>
+          <Text style={{ color: "white", fontWeight: "800", textAlign: "center" }}>
+            Save
+          </Text>
         </View>
       </TouchableOpacity>
 

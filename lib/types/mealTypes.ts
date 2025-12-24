@@ -1,6 +1,7 @@
-export type Meal = {
-  id: number; // v raw je number
-  time_of_day?: TimeOfDay | string; // raw je lowercase, pustimo string za "future-proof"
+export type TimeOfDay = "breakfast" | "lunch" | "dinner" | "snacks";
+
+export type LibraryMeal = {
+  id: number;
   name: string;
   allergies?: string;
   meal_type?: string;
@@ -8,9 +9,11 @@ export type Meal = {
   price?: number;
 };
 
-export type DayMenu = {
-  day: number; // v raw je number 1..7
-  menu: Meal[];
+export type MenuMeal = LibraryMeal & {
+  time_of_day: TimeOfDay; // tukaj ni optional
 };
 
-export type TimeOfDay = "breakfast" | "lunch" | "dinner" | "snacks";
+export type DayMenu = {
+  day: number; // 1..7
+  menu: MenuMeal[];
+};

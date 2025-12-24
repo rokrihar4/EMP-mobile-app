@@ -14,7 +14,7 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { deleteAll, deleteMeal } from "../../lib/storage/menusStorage";
-import type { DayMenu, Meal, TimeOfDay } from "../../lib/types/mealTypes";
+import type { DayMenu, MenuMeal, TimeOfDay } from "../../lib/types/mealTypes";
 
 const DAYS = [
   { id: "1", title: "Mon", dayNumber: 1 },
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
 
   mealCard: {
-    backgroundColor: "#F3F3F3",
+    backgroundColor: "#bebebeff",
     borderRadius: 12,
     padding: 12,
     marginTop: 10,
@@ -150,28 +150,32 @@ const styles = StyleSheet.create({
   },
 });
 
-function MealSection({ title, isLoading, meals, onDeleteMeal, day, }: {
+function MealSection({ title, time, isLoading, meals, onDeleteMeal, day }: {
     title: "Breakfast" | "Lunch" | "Dinner" | "Snacks";
+    time: TimeOfDay;
     isLoading: boolean;
-    meals: Meal[];
+    meals: MenuMeal[];
     onDeleteMeal: (mealId: number) => void;
     day: number;
   }) {
   return (
     <View style={styles.mealContainer}>
       <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 8,
-        }}
-      >
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 8,
+      }}
+    >
         <Text style={styles.mealText}>{title}</Text>
 
         <TouchableOpacity
           onPress={() =>
-            router.push({ pathname: "/(tabs)/library", params: { day: String(day) } })
+            router.push({
+              pathname: "/(tabs)/library",
+              params: { day: String(day), time },
+            })
           }
         >
           <View style={{ backgroundColor: "#0CD849", paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 }}>
@@ -210,7 +214,8 @@ export default function Saved() {
   const [isLoading, setIsLoading] = useState(true);
 
   // IZBRAN DAN je number, ker raw day je number
-  const [selectedDay, setSelectedDay] = useState<number>(1);
+  // Tole nastavm default dan današnji dan
+  const [selectedDay, setSelectedDay] = useState<number>(() => getTodayDayNumber());
 
   const dayMeals = useMemo(() => {
     const dayMenu = menus.find((m) => m.day === selectedDay);
@@ -297,6 +302,7 @@ export default function Saved() {
             meals={mealsFor("breakfast")}
             onDeleteMeal={onDeleteMeal}
             day={selectedDay}
+            time="breakfast"
           />
           <MealSection
             title="Lunch"
@@ -304,6 +310,7 @@ export default function Saved() {
             meals={mealsFor("lunch")}
             onDeleteMeal={onDeleteMeal}
             day={selectedDay}
+            time="lunch"
           />
           <MealSection
             title="Dinner"
@@ -311,6 +318,7 @@ export default function Saved() {
             meals={mealsFor("dinner")}
             onDeleteMeal={onDeleteMeal}
             day={selectedDay}
+            time="dinner"
           />
           <MealSection
             title="Snacks"
@@ -318,6 +326,7 @@ export default function Saved() {
             meals={mealsFor("snacks")}
             onDeleteMeal={onDeleteMeal}
             day={selectedDay}
+            time="snacks"
           />
 
           <TouchableOpacity onPress={onDeleteAll} style={{ width: "90%", alignItems: "center" }}>

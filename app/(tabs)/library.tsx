@@ -1,8 +1,7 @@
 
 import { STORAGE_KEYS } from "@/lib/storage/keys";
 import { deleteAllMeals, deleteMeal } from "@/lib/storage/mealsStorage";
-import { addMeal } from "@/lib/storage/menusStorage";
-import type { Meal } from "@/lib/types/mealTypes";
+import { LibraryMeal } from "@/lib/types/mealTypes";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import React, { useCallback, useMemo, useState } from "react";
@@ -88,7 +87,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Library() {
-  const [meals, setMeals] = useState<Meal[]>([]);
+  const [meals, setMeals] = useState<LibraryMeal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const { day } = useLocalSearchParams();
@@ -102,7 +101,7 @@ export default function Library() {
       (async () => {
         try {
           const raw = await AsyncStorage.getItem(STORAGE_KEYS.MEALS);
-          const parsed: Meal[] = raw ? JSON.parse(raw) : [];
+          const parsed: LibraryMeal[] = raw ? JSON.parse(raw) : [];
 
           const uniqueMeals = parsed.filter(
             (meal, index, arr) => index === arr.findIndex(m => m.id === meal.id)
@@ -155,8 +154,12 @@ export default function Library() {
     }
   };
 
+  const onEditMeal = (id: number) => {
+    router.push({ pathname: "/edit-meal", params: { mealId: String(id) } });
+  };
+
   const onAddMeal = () => {
-    router.push("/add-meal"); // naredi ta screen
+    router.push("/add-meal");
   };
 
   return (
@@ -182,13 +185,12 @@ export default function Library() {
           <View style={styles.rowTop}>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 18, fontWeight: "700" }}>{item.name}</Text>
-              <Text>{item.time_of_day}</Text>
               {!!item.allergies && <Text style={{ color: "red" }}>{item.allergies}</Text>}
               <Text>cca {item.prep_time ?? "-"} min - {item.price ?? "-"} €</Text>
             </View>
 
             <TouchableOpacity 
-              // onPress={() => onDeleteMeal(item.id)}  TODO: se treba še zment
+              onPress={() => onEditMeal(item.id)} 
               style={styles.editButton}
             >
               <Text style={styles.editButtonText}>Edit</Text>
@@ -202,8 +204,10 @@ export default function Library() {
           <TouchableOpacity
             onPress={async () => {
               try {
-                await addMeal(dayNumber, item);
-                router.back();
+                router.push({
+                  pathname: "/add-to-menu",
+                  params: { mealId: String(item.id) },
+                });
               } catch (e: any) {
                 Alert.alert("Error", e?.message ?? "Failed to add meal");
               }
