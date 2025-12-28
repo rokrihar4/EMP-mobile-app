@@ -17,25 +17,32 @@ const styles = StyleSheet.create({
   },
   dayCard: {
     backgroundColor: "#F3F3F3",
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 18,
     marginBottom: 20,
   },
   dayTitle: {
     fontSize: 20,
     fontWeight: "700",
-    marginBottom: 12,
+    marginBottom: 14,
   },
   mealCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: 12,
+    padding: 14,
     marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#E6E6E6",
   },
   mealName: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 6,
+  },
+  mealDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 4,
   },
   mealDetail: {
     fontSize: 14,
@@ -43,26 +50,38 @@ const styles = StyleSheet.create({
   },
   mealAllergies: {
     marginTop: 6,
-    color: "red",
+    color: "#C0392B",
     fontSize: 13,
+  },
+  timeBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#E9E9E9",
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 8,
+    marginBottom: 6,
+  },
+  timeText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#333",
   },
   buttonCustom: {
     backgroundColor: "#0CD849",
-    borderRadius: 11,
-    fontSize: 14,
-    margin: 10,
-    padding: 15,
+    borderRadius: 14,
+    marginVertical: 20,
+    padding: 16,
     width: "90%",
-    color: "white",
+    alignSelf: "center",
   },
   buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
-    justifyContent: "center",
   },
 });
+
 
 const Results = () => {
   
@@ -106,30 +125,38 @@ const Results = () => {
     }
   };
 
-  return (
+   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.container}>
-        {menus.map((m) => {
-          const meals = m.menu;
-          return (
-            <View key={m.day}>
-              <Text key={m.day} style={styles.dayTitle}>
-                Day {m.day}
-              </Text>
-              {meals.map((meal: Meal) => (
-                <View key={meal.id}>
-                  <Text>{meal.time_of_day}</Text>
-                  <Text>{meal.name}</Text>
+      <ScrollView contentContainerStyle={styles.listContent}>
+        {menus.map((day) => (
+          <View key={day.day} style={styles.dayCard}>
+            <Text style={styles.dayTitle}>Day {day.day}</Text>
+
+            {day.menu.map((meal) => (
+              <View key={meal.id} style={styles.mealCard}>
+                <View style={styles.timeBadge}>
+                  <Text style={styles.timeText}>{meal.time_of_day.toUpperCase()}</Text>
                 </View>
-              ))}
-            </View>
-          );
-        })}
-        <TouchableOpacity
-                style={styles.buttonCustom}
-                onPress={saveAndGo}
-              >
-                <Text style={styles.buttonText}>OK</Text>
+
+                <Text style={styles.mealName}>{meal.name}</Text>
+
+                <View style={styles.mealDetailRow}>
+                  <Text style={styles.mealDetail}>🕒 {meal.prep_time} min</Text>
+                  <Text style={styles.mealDetail}>💰 {meal.price} €</Text>
+                </View>
+
+                {meal.allergies ? (
+                  <Text style={styles.mealAllergies}>
+                    ⚠️ Allergies: {meal.allergies}
+                  </Text>
+                ) : null}
+              </View>
+            ))}
+          </View>
+        ))}
+
+        <TouchableOpacity style={styles.buttonCustom} onPress={saveAndGo}>
+          <Text style={styles.buttonText}>OK</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
