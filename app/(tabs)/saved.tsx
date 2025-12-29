@@ -122,10 +122,12 @@ const styles = StyleSheet.create({
   },
 
   mealCard: {
-    backgroundColor: "#bebebeff",
+    backgroundColor: "#D9D9D9",
     borderRadius: 12,
     padding: 12,
     marginTop: 10,
+    borderWidth: 1,
+    borderColor: "#b3b3b3ff", // or any color you want
   },
   mealRow: {
     flexDirection: "row",
