@@ -8,6 +8,7 @@ KupKo je mobilna aplikacija za **ustvarjanje večdnevnih jedilnikov** glede na:
 - in **izbrane obroke dneva** (breakfast/lunch/dinner/snacks).
 
 Aplikacija generira jedilnik prek zunanjega API-ja, nato pa omogoča **shranjevanje, urejanje** (dodajanje/brisanje obrokov) ter upravljanje **lokalne knjižnice obrokov**.
+Za bolj podrobno dokumentacijo si lahko ogledate [kupko_funk_spec.pdf](kupko_funk_spec.pdf).
 
 ## Slike
 
