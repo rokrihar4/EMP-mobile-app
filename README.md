@@ -23,7 +23,7 @@ Aplikacija generira jedilnik prek zunanjega API-ja, nato pa omogoča **shranjeva
 - Rok Rihar
 - Blaž Turk
 
-> Backend (API) je v ločenem GitHub repozitoriju.
+> Backend (API) je Python Flask aplikacija, ki je v ločenem GitHub repozitoriju.
 
 ---
 
