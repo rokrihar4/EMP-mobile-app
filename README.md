@@ -1,50 +1,57 @@
-# Welcome to your Expo app 👋
+# KupKo (mobile app)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+KupKo je mobilna aplikacija za **ustvarjanje večdnevnih jedilnikov** glede na:
+- **proračun**,
+- **maks. čas priprave**,
+- **prehranski tip** (npr. regular/vegan/vegetarian),
+- **alergene za izključitev**,
+- in **izbrane obroke dneva** (breakfast/lunch/dinner/snacks).
 
-## Get started
+Aplikacija generira jedilnik prek zunanjega API-ja, nato pa omogoča **shranjevanje, urejanje** (dodajanje/brisanje obrokov) ter upravljanje **lokalne knjižnice obrokov**.
 
-1. Install dependencies
+## Slike
 
-   ```bash
-   npm install
-   ```
+<p align="center">
+  <img src="screenshots/generate.png" width="20%" height="20%" />
+  <img src="screenshots/results.png" width="20%" height="20%" />
+  <img src="screenshots/saved.png" width="20%" height="20%"/>
+  <img src="screenshots/library.png" width="20%" height="20%"/>
+</p>
 
-2. Start the app
 
-   ```bash
-   npx expo start
-   ```
+## Avtorja
+- Rok Rihar
+- Blaž Turk
 
-In the output, you'll find options to open the app in a
+> Backend (API) je v ločenem GitHub repozitoriju.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Demo / API
 
-## Get a fresh project
+Ključni endpoint za generiranje:
+- `GET /random_menu` z query parametri, npr. `n`, `time_of_day`, `allergies`, `max_price`, `meal_type`, `time`
 
-When you're ready, run:
+---
 
+## Funkcionalnosti (na kratko)
+- **Generate menu**: vnos parametrov in klic API-ja za generiranje jedilnika
+- **Results**: prikaz rezultatov ter shranjevanje v lokalno shrambo
+- **Saved**: pregled shranjenega menija po dnevih + urejanje (brisanje/dodajanje)
+- **Library**: lokalna knjižnica obrokov (CRUD) + dodajanje obroka v meni
+
+---
+
+## Tehnologije
+- **React Native** + **Expo**
+- **Expo Router** (file-based routing)
+- **AsyncStorage** za lokalno shranjevanje (meniji + knjižnica obrokov)
+
+---
+
+## Zagon projekta (lokalno)
+
+### 1) Namesti odvisnosti
 ```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+npm install
+npx expo start
