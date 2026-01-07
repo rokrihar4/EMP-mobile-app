@@ -24,7 +24,7 @@ Za bolj podrobno dokumentacijo si lahko ogledate [kupko_funk_spec.pdf](kupko_fun
 - Rok Rihar
 - Blaž Turk
 
-> Backend (API) je Python Flask aplikacija, ki je v ločenem GitHub repozitoriju.
+> Backend (API) je Python Flask aplikacija, ki je v ločenem GitHub [KupKo API](https://github.com/blazturk/kupko-api) repozitoriju.
 
 ---
 
